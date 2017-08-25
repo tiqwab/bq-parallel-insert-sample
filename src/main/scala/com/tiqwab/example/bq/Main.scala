@@ -27,13 +27,24 @@ object Main {
 
     val dataSetName = "streaming_insert_sample"
 
+    println(s"start ${System.currentTimeMillis()}")
+
     val f = Future.traverse(1.to(10)) { x =>
       val tableId = TableId.of(dataSetName, s"ten_sec_limit_sample_$x")
       insertSimpleRecord(tableId)
     }
 
     val responses = Await.result(f, 1.minute)
+    val errorResponses = responses.filter(_.hasErrors)
+    if (errorResponses.size > 0) {
+      println("there are some errors")
+      errorResponses foreach { println(_)}
+    } else {
+      println("success")
+    }
     responses filter(_.hasErrors) foreach(println(_))
+
+    println(s"end ${System.currentTimeMillis()}")
   }
 
   def createSimpleRecord: Map[String, Any] = {
