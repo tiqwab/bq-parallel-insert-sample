@@ -1,6 +1,8 @@
 package com.tiqwab.example.bq
 
 import java.io.FileInputStream
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 import com.google.auth.oauth2.ServiceAccountCredentials
 
@@ -29,8 +31,12 @@ object Main {
 
     println(s"start ${System.currentTimeMillis()}")
 
+    val dateFormatter = DateTimeFormatter.BASIC_ISO_DATE
+
     val f = Future.traverse(1.to(10)) { x =>
-      val tableId = TableId.of(dataSetName, s"ten_sec_limit_sample_$x")
+      val dateStr = LocalDate.now().minusDays(x).format(dateFormatter)
+      println(dateStr)
+      val tableId = TableId.of(dataSetName, "ten_sec_limit_sample_1$" + dateStr)
       insertSimpleRecord(tableId)
     }
 
